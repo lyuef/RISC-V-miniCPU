@@ -48,7 +48,9 @@
 `define WRITE          1'b1
 
 // 外设I/O接口电路的端口地址
-`define PERI_ADDR_DIG   32'hFFFF_F000
-`define PERI_ADDR_LED   32'hFFFF_F060
-`define PERI_ADDR_SW    32'hFFFF_F070
-`define PERI_ADDR_BTN   32'hFFFF_F078
+`define PERI_ADDR_DIG       32'hFFFF_F000
+`define PERI_ADDR_TIMER_VAL 32'hFFFF_F020
+`define PERI_ADDR_TIMER_DIV 32'hFFFF_F024
+`define PERI_ADDR_LED       32'hFFFF_F060
+`define PERI_ADDR_SW        32'hFFFF_F070
+`define PERI_ADDR_BTN       32'hFFFF_F078

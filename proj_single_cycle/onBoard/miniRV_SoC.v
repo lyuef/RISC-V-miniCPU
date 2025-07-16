@@ -72,6 +72,14 @@ module miniRV_SoC (
     wire         clk_to_btn;
     wire [11:0]  addr_to_btn;
     wire [31:0]  rdata_from_btn;
+
+    // Interface to timer
+    wire         rst_to_timer;
+    wire         clk_to_timer;
+    wire [31:0]  addr_to_timer;
+    wire         wen_to_timer;
+    wire [31:0]  wdata_to_timer;
+    wire [31:0]  rdata_from_timer;
     
 
 `ifdef RUN_TRACE
@@ -151,7 +159,15 @@ module miniRV_SoC (
         .rst_to_btn         (rst_to_btn),
         .clk_to_btn         (clk_to_btn),
         .addr_to_btn        (addr_to_btn),
-        .rdata_from_btn     (rdata_from_btn)
+        .rdata_from_btn     (rdata_from_btn),
+
+        // Interface to timer
+        .rst_to_timer       (rst_to_timer),
+        .clk_to_timer       (clk_to_timer),
+        .addr_to_timer      (addr_to_timer),
+        .wen_to_timer       (wen_to_timer),
+        .wdata_to_timer     (wdata_to_timer),
+        .rdata_from_timer   (rdata_from_timer)
     );
 
     DRAM Mem_DRAM (
@@ -203,6 +219,15 @@ module miniRV_SoC (
         .DN_F(DN_F),
         .DN_G(DN_G),
         .DN_DP(DN_DP)
+    );
+
+    timer_peripheral u_timer(
+        .rst(rst_to_timer),
+        .clk(clk_to_timer),
+        .addr(addr_to_timer),
+        .we(wen_to_timer),
+        .wdata(wdata_to_timer),
+        .rdata(rdata_from_timer)
     );
 
 endmodule

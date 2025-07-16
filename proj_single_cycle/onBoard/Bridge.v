@@ -43,17 +43,27 @@ module Bridge (
     output wire         rst_to_btn,
     output wire         clk_to_btn,
     output wire [11:0]  addr_to_btn,
-    input  wire [31:0]  rdata_from_btn
+    input  wire [31:0]  rdata_from_btn,
+
+    // Interface to timer
+    output wire         rst_to_timer,
+    output wire         clk_to_timer,
+    output wire [31:0]  addr_to_timer,
+    output wire         wen_to_timer,
+    output wire [31:0]  wdata_to_timer,
+    input  wire [31:0]  rdata_from_timer
 );
 
     wire access_mem = (addr_from_cpu[31:12] != 20'hFFFFF) ? 1'b1 : 1'b0;
     wire access_dig = (addr_from_cpu == `PERI_ADDR_DIG) ? 1'b1 : 1'b0;
+    wire access_timer = (addr_from_cpu == `PERI_ADDR_TIMER_VAL || addr_from_cpu == `PERI_ADDR_TIMER_DIV) ? 1'b1 : 1'b0;
     wire access_led = (addr_from_cpu == `PERI_ADDR_LED) ? 1'b1 : 1'b0;
     wire access_sw  = (addr_from_cpu == `PERI_ADDR_SW ) ? 1'b1 : 1'b0;
     wire access_btn = (addr_from_cpu == `PERI_ADDR_BTN) ? 1'b1 : 1'b0;
     
-    wire [4:0] access_bit = { access_mem,
+    wire [5:0] access_bit = { access_mem,
                               access_dig,
+                              access_timer,
                               access_led,
                               access_sw,
                               access_btn };
@@ -89,13 +99,21 @@ module Bridge (
     assign clk_to_btn    = clk_from_cpu;
     assign addr_to_btn   = addr_from_cpu[11:0];
 
+    // Timer
+    assign rst_to_timer  = rst_from_cpu;
+    assign clk_to_timer  = clk_from_cpu;
+    assign addr_to_timer = addr_from_cpu;
+    assign wen_to_timer  = wen_from_cpu & access_timer;
+    assign wdata_to_timer = wdata_from_cpu;
+
     // Select read data towards CPU
     always @(*) begin
         casex (access_bit)
-            5'b1????: rdata_to_cpu = rdata_from_dram;
-            5'b00010: rdata_to_cpu = rdata_from_sw;
-            5'b00001: rdata_to_cpu = rdata_from_btn;
-            default:  rdata_to_cpu = 32'hFFFF_FFFF;
+            6'b1?????: rdata_to_cpu = rdata_from_dram;
+            6'b001000: rdata_to_cpu = rdata_from_timer;
+            6'b000010: rdata_to_cpu = rdata_from_sw;
+            6'b000001: rdata_to_cpu = rdata_from_btn;
+            default:   rdata_to_cpu = 32'hFFFF_FFFF;
         endcase
     end
 
